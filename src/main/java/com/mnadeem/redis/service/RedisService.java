@@ -15,7 +15,7 @@ public class RedisService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
-	@Resource(name = "redisTemplate")
+	@Resource(name = "objectRedisTemplate")
 	private SetOperations<String, String> setOps;
 
 	@Async
