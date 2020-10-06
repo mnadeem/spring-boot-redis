@@ -25,13 +25,27 @@ public class SpringBootRedisApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		setProducerConsumer();
+		//setProducerConsumer();
+		setPubSubBlockingWait();
 	}
 
 	private void setProducerConsumer() throws InterruptedException {
-		redisService.writeSet();
-		redisService.readSet();
-		redisService.readSet();		
 		LOGGER.info("Set Producer Consumer");
+		String key = "setKey";
+		redisService.writeSet(key);
+		redisService.readSet(key);
+		redisService.readSet(key);		
+		
+	}
+	
+	private void setPubSubBlockingWait() throws InterruptedException {
+		//https://redis.io/commands/blpop
+		LOGGER.info("Set Producer Consumer");
+
+		String setKey = "setKeyB";
+		String blockingKey = "setKeyLB";
+		redisService.writeSetBlocking(setKey, blockingKey);
+		redisService.readSetBlocking(setKey, blockingKey);
+		redisService.readSetBlocking(setKey, blockingKey);
 	}
 }
