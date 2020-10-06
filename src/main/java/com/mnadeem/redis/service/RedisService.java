@@ -77,7 +77,7 @@ public class RedisService {
 			if (i.get() == 10) {
 				break;
 			}
-
+			//https://redis.io/topics/transactions
 			stringRedisTemplate.execute(new SessionCallback<Object>() {
 
 				@SuppressWarnings("unchecked")
