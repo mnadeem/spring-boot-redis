@@ -56,9 +56,6 @@ public class RedisConfig {
 	StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
 		StringRedisTemplate template = new StringRedisTemplate();
 		template.setConnectionFactory(connectionFactory);
-		template.setKeySerializer(StringRedisSerializer.UTF_8);
-		template.setValueSerializer(StringRedisSerializer.UTF_8);
-		// other settings...
 		return template;
 	}
 }

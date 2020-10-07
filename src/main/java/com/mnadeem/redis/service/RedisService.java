@@ -1,6 +1,8 @@
 package com.mnadeem.redis.service;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
@@ -95,4 +99,19 @@ public class RedisService {
 			});
 		}
 	}
+
+	public List<String> executePipelined(String... ids) {
+		final List<String> entries = new ArrayList<>();
+		stringRedisTemplate.executePipelined(new RedisCallback<Object>() {
+			@Override 
+			public Object doInRedis(RedisConnection connection) throws DataAccessException { 
+				for(String id : ids) {
+					connection.get(id.getBytes());
+					// Some other operation utilizing connection
+				}		 
+				return null; 
+			}
+		}); 
+		return entries; 
+	}	
 }
