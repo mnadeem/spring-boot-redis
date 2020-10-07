@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundListOperations;
+import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
@@ -126,17 +127,46 @@ public class RedisService {
 		TimeUnit.SECONDS.sleep(1);
 		LOGGER.info("After 1s, Value for " + key + " : "  + stringRedisTemplate.opsForValue().get(key));
 	}
-	
+
 	@Async
-	public void setExpire(String key) throws InterruptedException {
+	public void listExpire(String key) throws InterruptedException {
 		BoundListOperations<String, String> boundOperations = stringRedisTemplate.boundListOps(key);
 		boundOperations.leftPush("SomeValue");
 		boundOperations.expire(Duration.ofSeconds(1));
 
 		TimeUnit.MILLISECONDS.sleep(100);
-		LOGGER.info("After 100 micro secs, Size for " + key + " : " + stringRedisTemplate.opsForList().size(key));
+		//LOGGER.info("After 100 micro secs, Size for " + key + " : " + stringRedisTemplate.opsForList().size(key));
+		LOGGER.info("After 100 micro secs, Size for " + key + " : " + boundOperations.size());
 		
 		TimeUnit.SECONDS.sleep(1);
-		LOGGER.info("After 1s, Size for " + key + " : "  +stringRedisTemplate.opsForList().size(key));
+		//LOGGER.info("After 1s, Size for " + key + " : "  + stringRedisTemplate.opsForList().size(key));
+		LOGGER.info("After 1s, Size for " + key + " : "  + boundOperations.size());
+	}
+
+	@Async
+	public void setExpire(String key) throws InterruptedException {
+
+		stringRedisTemplate.execute(new SessionCallback<Object>() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public Object execute(RedisOperations operations) throws DataAccessException {
+				do {
+					operations.multi();
+					BoundSetOperations<String, String> boundOperations = operations.boundSetOps(key);
+					boundOperations.add("Some value");
+					boundOperations.expire(Duration.ofSeconds(1));
+				} while (operations.exec() == null);
+				return null;
+			}
+		});
+
+		BoundSetOperations<String, String> boundOperations = stringRedisTemplate.boundSetOps(key);
+
+		TimeUnit.MILLISECONDS.sleep(100);
+		LOGGER.info("After 100 micro secs, Size for " + key + " : " + boundOperations.size());
+		
+		TimeUnit.SECONDS.sleep(1);
+		LOGGER.info("After 1s, Size for " + key + " : "  + boundOperations.size());
 	}
 }
