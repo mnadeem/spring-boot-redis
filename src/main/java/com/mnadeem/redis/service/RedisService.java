@@ -100,6 +100,7 @@ public class RedisService {
 		}
 	}
 
+	@Async
 	public List<String> executePipelined(String... ids) {
 		final List<String> entries = new ArrayList<>();
 		stringRedisTemplate.executePipelined(new RedisCallback<Object>() {
@@ -113,5 +114,15 @@ public class RedisService {
 			}
 		}); 
 		return entries; 
-	}	
+	}
+	
+	@Async
+	public void valExpire(String key) throws InterruptedException {
+		stringRedisTemplate.opsForValue().set(key, "SomeValue", Duration.ofSeconds(1));
+		TimeUnit.MILLISECONDS.sleep(100);
+		LOGGER.info("Value for " + key + " : " + stringRedisTemplate.opsForValue().get(key));
+		
+		TimeUnit.SECONDS.sleep(1);
+		LOGGER.info("Value for " + key + " : "  + stringRedisTemplate.opsForValue().get(key));
+	}
 }
