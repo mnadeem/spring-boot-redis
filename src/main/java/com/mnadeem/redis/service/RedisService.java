@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
@@ -120,9 +121,22 @@ public class RedisService {
 	public void valExpire(String key) throws InterruptedException {
 		stringRedisTemplate.opsForValue().set(key, "SomeValue", Duration.ofSeconds(1));
 		TimeUnit.MILLISECONDS.sleep(100);
-		LOGGER.info("Value for " + key + " : " + stringRedisTemplate.opsForValue().get(key));
+		LOGGER.info("After 100 micro secs, Value for " + key + " : " + stringRedisTemplate.opsForValue().get(key));
 		
 		TimeUnit.SECONDS.sleep(1);
-		LOGGER.info("Value for " + key + " : "  + stringRedisTemplate.opsForValue().get(key));
+		LOGGER.info("After 1s, Value for " + key + " : "  + stringRedisTemplate.opsForValue().get(key));
+	}
+	
+	@Async
+	public void setExpire(String key) throws InterruptedException {
+		BoundListOperations<String, String> boundOperations = stringRedisTemplate.boundListOps(key);
+		boundOperations.leftPush("SomeValue");
+		boundOperations.expire(Duration.ofSeconds(1));
+
+		TimeUnit.MILLISECONDS.sleep(100);
+		LOGGER.info("After 100 micro secs, Size for " + key + " : " + stringRedisTemplate.opsForList().size(key));
+		
+		TimeUnit.SECONDS.sleep(1);
+		LOGGER.info("After 1s, Size for " + key + " : "  +stringRedisTemplate.opsForList().size(key));
 	}
 }

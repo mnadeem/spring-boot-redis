@@ -51,7 +51,7 @@ public class SpringBootRedisApplication implements CommandLineRunner {
 	}
 	
 	private void expire() throws InterruptedException {
-		String key = "valKey";
-		redisService.valExpire(key);
+		redisService.valExpire("valExpireKey");
+		redisService.setExpire("setExpireKey");
 	}
 }
