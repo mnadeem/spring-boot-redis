@@ -27,7 +27,8 @@ public class SpringBootRedisApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		//setProducerConsumer();
 		//setPubSubBlockingWait();
-		expire();
+		//expire();
+		listProducerConsumer();
 	}
 
 	private void setProducerConsumer() throws InterruptedException {
@@ -54,5 +55,13 @@ public class SpringBootRedisApplication implements CommandLineRunner {
 		redisService.valExpire("valExpireKey");
 		redisService.setExpire("setExpireKey");
 		redisService.listExpire("listExpireKey");
+	}
+	
+	private void listProducerConsumer() throws InterruptedException {
+		LOGGER.info("List Producer Consumer");
+		String key = "listKey";
+		redisService.readList(key);
+		redisService.readList(key);
+		redisService.writeList(key);
 	}
 }

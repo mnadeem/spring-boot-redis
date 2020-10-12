@@ -15,6 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
@@ -30,6 +31,9 @@ public class RedisService {
 
 	@Resource(name = "redisTemplate")
 	private SetOperations<String, String> setOps;
+	
+	@Resource(name = "redisTemplate")
+	private ListOperations<String, String> listOps;
 
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -168,5 +172,26 @@ public class RedisService {
 		
 		TimeUnit.SECONDS.sleep(1);
 		LOGGER.info("After 1s, Size for " + key + " : "  + boundOperations.size());
+	}
+
+	public void writeList(String key) throws InterruptedException {
+		int i = 0;
+		while (true) {
+			TimeUnit.MINUTES.sleep(2);
+			if (i == 10) {
+				break;
+			}
+			listOps.leftPush(key, String.valueOf(i));
+			LOGGER.info("Pushed {}", i);
+			i++;
+		}		
+	}
+
+	public void readList(String key) throws InterruptedException {
+		while (true) {
+			LOGGER.info("Blocking for read");
+			String value = listOps.rightPop(key, Duration.ZERO);
+			LOGGER.info("Read value {} ", value);
+		}
 	}
 }
