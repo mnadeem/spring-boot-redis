@@ -1,4 +1,4 @@
-package com.mnadeem.redis;
+package com.mnadeem.redis.config;
 
 import java.util.concurrent.Executor;
 

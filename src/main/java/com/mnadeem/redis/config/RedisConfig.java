@@ -1,4 +1,4 @@
-package com.mnadeem.redis;
+package com.mnadeem.redis.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +14,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.mnadeem.redis.ClusterConfigurationProperties;
 
 import io.lettuce.core.ReadFrom;
 
@@ -51,7 +53,7 @@ public class RedisConfig {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(name = "redisTemplate")
+	//@ConditionalOnMissingBean(name = "redisTemplate")
 	@Primary
 	StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
 		StringRedisTemplate template = new StringRedisTemplate();
